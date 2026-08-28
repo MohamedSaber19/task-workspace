@@ -1,6 +1,8 @@
 import { QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import { Toaster } from "sonner";
 import App from "./App";
 import { ThemeProvider } from "./context/ThemeContext";
 import "./index.css";
@@ -19,7 +21,10 @@ enableMocking().then(() => {
     <React.StrictMode>
       <ThemeProvider defaultTheme="dark" storageKey="task-workspace-theme">
         <QueryClientProvider client={queryClient}>
-          <App />
+          <BrowserRouter>
+            <App />
+            <Toaster position="top-right" richColors />
+          </BrowserRouter>
         </QueryClientProvider>
       </ThemeProvider>
     </React.StrictMode>,
