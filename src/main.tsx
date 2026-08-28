@@ -9,11 +9,15 @@ import "./index.css";
 import { queryClient } from "./lib/react-query";
 
 async function enableMocking() {
-  if (import.meta.env.MODE !== "development") {
-    return;
-  }
+  // Enables MSW in both Vite local dev and production build on Vercel
   const { worker } = await import("./api/browser");
-  return worker.start({ onUnhandledRequest: "bypass" });
+
+  return worker.start({
+    onUnhandledRequest: "bypass",
+    serviceWorker: {
+      url: "/mockServiceWorker.js",
+    },
+  });
 }
 
 enableMocking().then(() => {

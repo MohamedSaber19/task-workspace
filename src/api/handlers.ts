@@ -1,73 +1,88 @@
-import { delay, http, HttpResponse } from "msw";
-import type { Task } from "../types/task";
+import type { CreateTaskDTO, Task, UpdateTaskDTO } from "@/types/task";
+import { http, HttpResponse } from "msw";
 
-let initialTasks: Task[] = [
+const STORAGE_KEY = "msw_kanban_tasks";
+
+const INITIAL_TASKS: Task[] = [
   {
-    id: "1",
-    title: "Setup initial repository architecture",
-    description: "Configure Vite, TypeScript strict mode, and folder layout.",
+    id: "task-1",
+    title: "Setup MSW Mocking",
+    description: "Configure MSW to run in dev and production Vercel builds",
+    status: "Done",
     priority: "High",
-    status: "In Progress",
-    dueDate: "2026-09-01",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    dueDate: "2026-08-30",
+    createdAt: "2026-08-30T00:00:00.000Z",
+    updatedAt: "2026-08-30T00:00:00.000Z",
   },
   {
-    id: "2",
-    title: "Design Kanban board layout",
-    description: "Implement responsive 4-column layout using Tailwind CSS.",
-    priority: "Medium",
-    status: "To Do",
-    dueDate: "2026-09-05",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    id: "task-2",
+    title: "Test Drag and Drop",
+    description: "Verify status updates through MSW network interceptor",
+    status: "In Progress",
+    priority: "Urgent",
+    dueDate: "2026-09-02",
+    createdAt: "2026-09-02T00:00:00.000Z",
+    updatedAt: "2026-09-02T00:00:00.000Z",
   },
 ];
 
+function getStoredTasks(): Task[] {
+  const data = localStorage.getItem(STORAGE_KEY);
+  if (!data) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_TASKS));
+    return INITIAL_TASKS;
+  }
+  return JSON.parse(data);
+}
+
+function saveTasks(tasks: Task[]) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
 export const handlers = [
-  http.get("/api/tasks", async () => {
-    await delay(300);
-    return HttpResponse.json(initialTasks);
+  // GET /api/tasks
+  http.get("/api/tasks", () => {
+    return HttpResponse.json(getStoredTasks());
   }),
 
+  // POST /api/tasks
   http.post("/api/tasks", async ({ request }) => {
-    await delay(300);
-    const body = (await request.json()) as Omit<
-      Task,
-      "id" | "createdAt" | "updatedAt"
-    >;
+    const dto = (await request.json()) as CreateTaskDTO;
+    const tasks = getStoredTasks();
     const newTask: Task = {
-      ...body,
-      id: crypto.randomUUID(),
+      ...dto,
+      id: `task-${Date.now()}`,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    initialTasks.push(newTask);
+    saveTasks([newTask, ...tasks]);
     return HttpResponse.json(newTask, { status: 201 });
   }),
 
+  // PATCH /api/tasks/:id
   http.patch("/api/tasks/:id", async ({ params, request }) => {
-    await delay(300);
     const { id } = params;
-    const body = (await request.json()) as Partial<Task>;
-    let updatedTask: Task | undefined;
+    const dto = (await request.json()) as UpdateTaskDTO;
+    const tasks = getStoredTasks();
+    let updatedTask: Task | null = null;
 
-    initialTasks = initialTasks.map((t) => {
+    const updated = tasks.map((t) => {
       if (t.id === id) {
-        updatedTask = { ...t, ...body, updatedAt: new Date().toISOString() };
+        updatedTask = { ...t, ...dto };
         return updatedTask;
       }
       return t;
     });
 
-    if (!updatedTask) return new HttpResponse(null, { status: 404 });
+    saveTasks(updated);
     return HttpResponse.json(updatedTask);
   }),
 
-  http.delete("/api/tasks/:id", async ({ params }) => {
-    await delay(300);
+  // DELETE /api/tasks/:id
+  http.delete("/api/tasks/:id", ({ params }) => {
     const { id } = params;
-    initialTasks = initialTasks.filter((t) => t.id !== id);
-    return new HttpResponse(null, { status: 204 });
+    const tasks = getStoredTasks();
+    saveTasks(tasks.filter((t) => t.id !== id));
+    return HttpResponse.json({ success: true });
   }),
 ];
