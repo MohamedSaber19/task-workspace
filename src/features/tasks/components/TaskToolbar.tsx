@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -8,9 +7,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { TaskPriority, TaskStatus } from "@/types/task";
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import React from "react";
 import { useTaskFilters } from "../hooks/useTaskFilters";
+import { SearchInput } from "./SearchInput";
 
 export const TaskToolbar: React.FC = () => {
   const { filters, setFilters, resetFilters } = useTaskFilters();
@@ -21,17 +21,12 @@ export const TaskToolbar: React.FC = () => {
     filters.priority !== "All";
 
   return (
-    <div className="flex flex-wrap items-center gap-3 py-4">
-      {/* Search Input */}
-      <div className="relative min-w-50 flex-1">
-        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-        <Input
-          placeholder="Filter tasks by name..."
-          value={filters.search}
-          onChange={(e) => setFilters({ search: e.target.value })}
-          className="pl-8"
-        />
-      </div>
+    <div className="flex flex-wrap items-center gap-3 py-2">
+      <SearchInput
+        value={filters.search}
+        onChange={(val) => setFilters({ search: val })}
+      />
+
       {/* Status Filter */}
       <Select
         value={filters.status}
@@ -70,7 +65,7 @@ export const TaskToolbar: React.FC = () => {
         </SelectContent>
       </Select>
 
-      {/* Reset Filters */}
+      {/* Clear Button */}
       {isFiltered && (
         <Button
           variant="ghost"
