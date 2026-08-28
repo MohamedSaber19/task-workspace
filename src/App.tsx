@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { Header } from "./components/Header";
-import { KanbanBoard } from "./features/tasks/components/KanbanBoard";
 import { TaskModal } from "./features/tasks/components/TaskModal";
+import { TasksView } from "./features/tasks/components/TasksView";
 import { useTaskMutations, useTasks } from "./features/tasks/hooks/useTasks";
 import type { TaskFormData } from "./features/tasks/schemas/taskSchema";
 import type { Task } from "./types/task";
@@ -14,6 +14,11 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleOpenNewTask = () => {
+    setEditingTask(null);
+    setIsModalOpen(true);
+  };
 
   const handleCreateOrUpdate = (formData: TaskFormData) => {
     if (editingTask) {
@@ -43,24 +48,31 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-zinc-50 p-4 md:p-6 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
-      <Header onNewTask={() => setIsModalOpen(true)} />
+      <Header onNewTask={handleOpenNewTask} />
 
-      {isLoading ? (
-        <div className="py-12 text-center text-zinc-500">Loading tasks...</div>
-      ) : isError ? (
-        <div className="py-12 text-center text-red-500">
-          Failed to load tasks
-        </div>
-      ) : (
-        <KanbanBoard
-          tasks={tasks}
-          onEdit={(task) => {
-            setEditingTask(task);
-            setIsModalOpen(true);
-          }}
-          onDelete={(id) => setDeletingId(id)}
-        />
-      )}
+      <main className="container mx-auto mt-4">
+        {isLoading ? (
+          <div className="py-12 text-center text-zinc-500">
+            Loading tasks...
+          </div>
+        ) : isError ? (
+          <div className="py-12 text-center text-red-500">
+            Failed to load tasks
+          </div>
+        ) : (
+          <TasksView
+            tasks={tasks}
+            onTaskStatusChange={(taskId, newStatus) =>
+              updateMutation.mutate({ id: taskId, dto: { status: newStatus } })
+            }
+            onEdit={(task) => {
+              setEditingTask(task);
+              setIsModalOpen(true);
+            }}
+            onDelete={(id) => setDeletingId(id)}
+          />
+        )}
+      </main>
 
       <TaskModal
         isOpen={isModalOpen}

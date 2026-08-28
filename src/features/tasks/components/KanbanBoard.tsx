@@ -1,11 +1,11 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Status, Task } from "@/types/task";
+import type { Task, TaskStatus } from "@/types/task";
 import { Pencil, Trash2 } from "lucide-react";
 import React from "react";
 
-const COLUMNS: Status[] = ["To Do", "In Progress", "In Review", "Done"];
+const COLUMNS: TaskStatus[] = ["To Do", "In Progress", "In Review", "Done"];
 
 const priorityVariants: Record<
   Task["priority"],
@@ -19,8 +19,10 @@ const priorityVariants: Record<
 
 interface KanbanBoardProps {
   tasks: Task[];
-  onEdit: (task: Task) => void;
-  onDelete: (taskId: string) => void;
+  onEdit?: (task: Task) => void;
+  onDelete?: (taskId: string) => void;
+  onTaskStatusChange: (taskId: string, newStatus: TaskStatus) => void;
+  onTaskClick?: (task: Task) => void;
 }
 
 export const KanbanBoard: React.FC<KanbanBoardProps> = ({
@@ -57,7 +59,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           variant="ghost"
                           size="icon"
                           className="size-6"
-                          onClick={() => onEdit(task)}
+                          onClick={() => onEdit?.(task)}
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
@@ -65,7 +67,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                           variant="ghost"
                           size="icon"
                           className="size-6 text-destructive hover:text-destructive"
-                          onClick={() => onDelete(task.id)}
+                          onClick={() => onDelete?.(task.id)}
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
