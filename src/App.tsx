@@ -42,7 +42,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-50 p-6 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
+    <div className="min-h-screen bg-zinc-50 p-4 md:p-6 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100">
       <Header onNewTask={() => setIsModalOpen(true)} />
 
       {isLoading ? (

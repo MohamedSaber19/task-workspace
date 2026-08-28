@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ onNewTask }) => {
           <CheckSquare className="h-5 w-5" />
         </div>
         <div>
-          <h1 className="font-semibold text-base leading-none">
+          <h1 className="font-semibold text-sm md:text-base leading-none">
             Task Workspace
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">
