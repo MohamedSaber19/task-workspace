@@ -73,7 +73,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className="space-y-3 flex-1 h-full min-h-100 lg:max-h-[calc(100vh-300px)] lg:overflow-y-scroll pb-6"
+                    className="space-y-3 flex-1 h-full min-h-100 lg:max-h-[calc(100vh-300px)] lg:overflow-y-auto pb-6"
                   >
                     {columnTasks.map((task, index) => (
                       <Draggable
