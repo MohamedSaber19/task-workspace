@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/incompatible-library */
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -57,7 +58,7 @@ export const VirtualizedTaskList: React.FC<VirtualizedTaskListProps> = ({
 
   if (tasks.length === 0) {
     return (
-      <div className="flex h-[400px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
+      <div className="flex h-100 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-8 text-center">
         <p className="text-sm text-muted-foreground">
           No tasks found matching your filters.
         </p>
@@ -68,7 +69,7 @@ export const VirtualizedTaskList: React.FC<VirtualizedTaskListProps> = ({
   return (
     <div
       ref={parentRef}
-      className="h-[calc(100vh-220px)] min-h-[500px] overflow-auto rounded-xl border border-slate-200 dark:border-slate-800 p-3"
+      className="h-[calc(100vh-220px)] min-h-125 overflow-auto rounded-xl border border-slate-200 dark:border-slate-800 p-3"
     >
       <div
         className="relative w-full"
