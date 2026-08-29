@@ -94,7 +94,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 py-2">
-          <div className="space-y-1">
+          <div className="space-y-1 flex flex-col gap-0.5">
             <label className="text-sm font-medium">Title</label>
             <Input {...register("title")} placeholder="Task title..." />
             {errors.title && (
@@ -102,7 +102,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             )}
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 flex flex-col gap-0.5">
             <label className="text-sm font-medium">Description</label>
             <Textarea
               {...register("description")}
@@ -117,7 +117,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
+            <div className="space-y-1 flex flex-col gap-0.5">
               <label className="text-sm font-medium">Priority</label>
               <Select
                 value={currentPriority}
@@ -137,7 +137,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
               </Select>
             </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1 flex flex-col gap-0.5">
               <label className="text-sm font-medium">Status</label>
               <Select
                 value={currentStatus}
@@ -158,7 +158,7 @@ export const TaskModal: React.FC<TaskModalProps> = ({
             </div>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-1 flex flex-col gap-0.5">
             <label className="text-sm font-medium">Due Date</label>
             <Input type="date" {...register("dueDate")} />
             {errors.dueDate && (
