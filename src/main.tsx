@@ -4,6 +4,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { Toaster } from "sonner";
 import App from "./App";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { ThemeProvider } from "./context/ThemeContext";
 import "./index.css";
 import { queryClient } from "./lib/react-query";
@@ -26,7 +27,9 @@ enableMocking().then(() => {
       <ThemeProvider defaultTheme="dark" storageKey="task-workspace-theme">
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
             <Toaster position="top-right" richColors />
           </BrowserRouter>
         </QueryClientProvider>
