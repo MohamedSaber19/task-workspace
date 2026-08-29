@@ -59,7 +59,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
           return (
             <div
               key={status}
-              className="rounded-xl bg-muted/50 p-4 border border-slate-200 dark:border-0 dark:bg-slate-600 flex flex-col min-h-[500px]"
+              className="rounded-xl bg-muted/50 p-4 border border-slate-200 dark:border-0 dark:bg-slate-600 flex flex-col min-h-125"
             >
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-semibold text-sm">{status}</h3>
@@ -73,7 +73,7 @@ export const KanbanBoard: React.FC<KanbanBoardProps> = ({
                   <div
                     ref={provided.innerRef}
                     {...provided.droppableProps}
-                    className="space-y-3 flex-1 h-full min-h-[400px]"
+                    className="space-y-3 flex-1 h-full min-h-100 lg:max-h-[calc(100vh-300px)] lg:overflow-y-scroll pb-6"
                   >
                     {columnTasks.map((task, index) => (
                       <Draggable

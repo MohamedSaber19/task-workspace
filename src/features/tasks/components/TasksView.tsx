@@ -3,8 +3,10 @@ import type { Task, TaskStatus } from "@/types/task";
 import { LayoutGrid, List, SearchX } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { useTaskFilters } from "../hooks/useTaskFilters";
+import { useTaskMutations } from "../hooks/useTasks";
 import { KanbanBoard } from "./KanbanBoard";
 import { TaskToolbar } from "./TaskToolbar";
+import { VirtualizedTaskList } from "./VirtualizedTaskList";
 
 export interface TasksViewProps {
   tasks: Task[];
@@ -16,13 +18,12 @@ export interface TasksViewProps {
 
 export const TasksView: React.FC<TasksViewProps> = ({
   tasks,
-  onTaskStatusChange,
   onEdit,
-  onDelete,
   onTaskClick,
 }) => {
   const { filters } = useTaskFilters();
   const [viewMode, setViewMode] = useState<"board" | "list">("board");
+  const { updateMutation, deleteMutation } = useTaskMutations();
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
@@ -79,58 +80,19 @@ export const TasksView: React.FC<TasksViewProps> = ({
       ) : viewMode === "board" ? (
         <KanbanBoard
           tasks={filteredTasks}
-          onTaskStatusChange={onTaskStatusChange}
+          onTaskStatusChange={(id, newStatus) =>
+            updateMutation.mutate({ id, dto: { status: newStatus } })
+          }
           onEdit={onEdit}
-          onDelete={onDelete}
+          onDelete={(id) => deleteMutation.mutate(id)}
           onTaskClick={onTaskClick}
         />
       ) : (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredTasks.map((task) => (
-            <div
-              key={task.id}
-              onClick={() => (onEdit ? onEdit(task) : onTaskClick?.(task))}
-              className="group relative cursor-pointer rounded-xl border border-border/80 bg-card p-4 text-card-foreground shadow-xs transition-all hover:border-border hover:shadow-md"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <h3 className="font-medium text-sm leading-snug">
-                  {task.title}
-                </h3>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  {/* Priority Badge */}
-                  <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold text-secondary-foreground">
-                    {task.priority}
-                  </span>
-                </div>
-              </div>
-
-              {task.description && (
-                <p className="mt-2 text-xs text-muted-foreground line-clamp-2">
-                  {task.description}
-                </p>
-              )}
-
-              {/* Card Footer: Status Badge + Actions */}
-              <div className="mt-4 flex items-center justify-between border-t border-border/40 pt-2.5 text-[11px] text-muted-foreground">
-                <span className="rounded-md bg-muted px-2 py-0.5 font-mono text-[10px] font-medium">
-                  {task.status}
-                </span>
-
-                {onDelete && (
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDelete(task.id);
-                    }}
-                    className="text-xs text-destructive hover:underline opacity-80 group-hover:opacity-100"
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+        <VirtualizedTaskList
+          tasks={tasks}
+          onDelete={(id) => deleteMutation.mutate(id)}
+          onEdit={(task) => onEdit?.(task)}
+        />
       )}
     </div>
   );
