@@ -8,32 +8,59 @@ import {
 } from "@/components/ui/select";
 import type { TaskPriority, TaskStatus } from "@/types/task";
 import { X } from "lucide-react";
-import React from "react";
+import React, { useCallback, useTransition } from "react";
 import { useTaskFilters } from "../hooks/useTaskFilters";
 import { SearchInput } from "./SearchInput";
 
 export const TaskToolbar: React.FC = () => {
   const { filters, setFilters, resetFilters } = useTaskFilters();
+  const [, startTransition] = useTransition();
 
   const isFiltered =
     filters.search !== "" ||
     filters.status !== "All" ||
     filters.priority !== "All";
 
+  // Wrap search state updates in startTransition to defer rendering filtered lists
+  const handleSearchChange = useCallback(
+    (search: string) => {
+      startTransition(() => {
+        setFilters({ search });
+      });
+    },
+    [setFilters],
+  );
+
+  const handleStatusChange = useCallback(
+    (status: string) => {
+      startTransition(() => {
+        setFilters({ status: status as TaskStatus | "All" });
+      });
+    },
+    [setFilters],
+  );
+
+  const handlePriorityChange = useCallback(
+    (priority: string) => {
+      startTransition(() => {
+        setFilters({ priority: priority as TaskPriority | "All" });
+      });
+    },
+    [setFilters],
+  );
+
+  const handleReset = useCallback(() => {
+    startTransition(() => {
+      resetFilters();
+    });
+  }, [resetFilters]);
+
   return (
     <div className="flex flex-wrap items-center gap-3 py-2">
-      <SearchInput
-        value={filters.search}
-        onChange={(val) => setFilters({ search: val })}
-      />
+      <SearchInput value={filters.search} onChange={handleSearchChange} />
 
       {/* Status Filter */}
-      <Select
-        value={filters.status}
-        onValueChange={(val) =>
-          setFilters({ status: val as TaskStatus | "All" })
-        }
-      >
+      <Select value={filters.status} onValueChange={handleStatusChange}>
         <SelectTrigger className="w-35">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
@@ -47,12 +74,7 @@ export const TaskToolbar: React.FC = () => {
       </Select>
 
       {/* Priority Filter */}
-      <Select
-        value={filters.priority}
-        onValueChange={(val) =>
-          setFilters({ priority: val as TaskPriority | "All" })
-        }
-      >
+      <Select value={filters.priority} onValueChange={handlePriorityChange}>
         <SelectTrigger className="w-35">
           <SelectValue placeholder="Priority" />
         </SelectTrigger>
@@ -69,7 +91,7 @@ export const TaskToolbar: React.FC = () => {
       {isFiltered && (
         <Button
           variant="ghost"
-          onClick={resetFilters}
+          onClick={handleReset}
           className="h-9 px-2 text-xs gap-1"
         >
           <X className="h-3.5 w-3.5" />

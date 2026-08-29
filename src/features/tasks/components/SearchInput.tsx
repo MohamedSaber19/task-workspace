@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { useDebounce } from "@/hooks/useDebounce";
 import { Search, X } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
@@ -15,23 +14,34 @@ export const SearchInput: React.FC<SearchInputProps> = ({
   placeholder = "Filter tasks by title or description...",
 }) => {
   const [localValue, setLocalValue] = useState(value);
-  const debouncedValue = useDebounce(localValue, 300);
-
-  // Store latest onChange reference to avoid unnecessary effect triggers
   const onChangeRef = useRef(onChange);
+
   useEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
 
-  // Propagate debounced changes ONLY if they differ from current prop
+  // Sync external prop resets
+  const [prevValue, setPrevValue] = useState(value);
+  if (value !== prevValue) {
+    setPrevValue(value);
+    setLocalValue(value);
+  }
+
+  // Handle live typing debounce
   useEffect(() => {
-    if (debouncedValue !== value) {
-      onChangeRef.current(debouncedValue);
-    }
-  }, [debouncedValue, value]);
+    const timer = setTimeout(() => {
+      if (localValue !== value) {
+        onChangeRef.current(localValue);
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [localValue, value]);
 
   const handleClear = () => {
+    // Reset local state instantly
     setLocalValue("");
+    // Bypass debounce timer and immediately notify parent
     onChangeRef.current("");
   };
 
@@ -47,6 +57,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({
       {localValue && (
         <button
           type="button"
+          onMouseDown={(e) => e.preventDefault()} // Prevent focus loss
           onClick={handleClear}
           className="absolute right-2.5 top-2.5 text-muted-foreground hover:text-foreground"
           aria-label="Clear search"
